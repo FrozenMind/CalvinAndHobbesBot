@@ -1,0 +1,24 @@
+{
+  "name": "calvinandhobbesbot",
+  "version": "1.0.0",
+  "description": "A Telegram Bot that send a CnH Comic every day",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FrozenMind/CalvinAndHobbesBot.git"
+  },
+  "author": "Valentin Rebscher (FrozenMind)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FrozenMind/CalvinAndHobbesBot/issues"
+  },
+  "homepage": "https://github.com/FrozenMind/CalvinAndHobbesBot#readme",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "node-telegram-bot-api": "^0.27.1",
+    "request": "^2.81.0"
+  }
+}
