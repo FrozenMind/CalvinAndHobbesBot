@@ -146,6 +146,7 @@ function startInterval(callback) {
 }
 
 function updateUser(id, active, time) {
+  var userFound = false
   //split time to hour and min
   var h, m
   if (time) {
