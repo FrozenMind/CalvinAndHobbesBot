@@ -21,14 +21,16 @@ readUsers(function() {
 //some messages
 var botVersion = "CalvinAndHobbesBot\n" +
   "Author: FrozenMind\n" +
-  "Version: 0.1.1 (alpha)\n" +
+  "Version: 0.1.2 (alpha)\n" +
   "Last update: 07/09/2017\n" +
   "Github repo: https://github.com/FrozenMind/CalvinAndHobbesBot"
 var welcomeMessage = "Welcome to my Calvin and Hobbes bot (alpha).\n" +
   "This bot send you everyday to your favorite time a daily Calvin and Hobbes comic.\n" +
   "I hope you enjoy them. Type '/help' to get started."
 var helpMessage = "Help Area:\n" +
-  "/time hh:mm -> set the time you want to receive the bot. (24h)\n-> i.e. '/time 18:25' to receive the daily comic at 18:25\n" +
+  "/time hh:mm -> set the time you want to receive the comic. (24h)\n-> i.e. '/time 18:25' to receive the daily comic at 18:25\n" +
+  "/dailycomic -> sends you the daily comic" +
+  "/randomcomic -> sends you a random comic (coming soon)" +
   "/stop -> to stop the bot\n" +
   "/restart -> to restart the bot with your old time. use '/time' to set a new one\n" +
   "/status -> get your time and if your bot active or not\n" +
@@ -77,6 +79,14 @@ function initBot(callback) {
   //check the bot version
   bot.onText(/\/version/, (msg) => {
     bot.sendMessage(msg.chat.id, botVersion)
+  })
+  //send daily comic now
+  bot.onText(/\/dailycomic/, (msg) => {
+    sendImage(new Date(), msg.chat.id)
+  })
+  //send daily comic now
+  bot.onText(/\/randomcomic/, (msg) => {
+    sendImage(new Date(), msg.chat.id)
   })
 
   //set up done, so run callback
