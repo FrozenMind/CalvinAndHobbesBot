@@ -29,7 +29,7 @@ var welcomeMessage = "Welcome to my Calvin and Hobbes bot (alpha).\n" +
   "I hope you enjoy them. Type '/help' to get started."
 var helpMessage = "Help Area:\n" +
   "/time hh:mm -> set the time you want to receive the comic. (24h)\n-> i.e. '/time 18:25' to receive the daily comic at 18:25\n" +
-  "/dailycomic -> sends you the daily comic" +
+  "/dailycomic -> sends you the daily comic\n" +
   "/randomcomic -> sends you a random comic (coming soon)" +
   "/stop -> to stop the bot\n" +
   "/restart -> to restart the bot with your old time. use '/time' to set a new one\n" +
