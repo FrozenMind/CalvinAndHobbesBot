@@ -13,7 +13,8 @@ startInterval()
 
 //initialite telegram bot
 function initBot() {
-  bot = new TelegramBot(process.env.CAH_BOT, { //token is read from environment
+  //read token out of file
+  bot = new TelegramBot(fs.readFileSync(__dirname + '/telegramToken.config').toString(), {
     polling: true
   })
   bot.on('message', (msg) => {
