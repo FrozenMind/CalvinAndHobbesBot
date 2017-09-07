@@ -1,10 +1,14 @@
 [
   {
     id: 12345,
-    time: 8:25
+    hour: 08,
+    min: 25,
+    active: true
   },
   {
     id: 54321,
-    time: 22:00
+    hour: 22,
+    min: 00,
+    active: false
   }
 ]

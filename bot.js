@@ -5,6 +5,7 @@ var fs = require('fs')
 var bot
 var users = [] //user array
 var inter //interval to check if pic needs to be send
+var sendPics = [] //cache which user received a pic in the last 3 min
 
 //read users, init bot & start interval with callbacks, cause of sync file readers
 readUsers(function() {
@@ -19,12 +20,13 @@ readUsers(function() {
 
 //some messages
 var welcomeMessage = "Welcome to my Calvin and Hobbes bot.\n" +
-  "I hope you enjoy the comics. Type '/help' to get started."
+  "This bot send you everyday to your favorite time a daily Calvin and Hobbes comic.\n" +
+  "I hope you enjoy them. Type '/help' to get started."
 var helpMessage = "Help Area:\n" +
-  "/time hh:mm -> set the time you want to receive the bot. (24h) -> i.e. '/time 18:25' to receive the daily comic at 18:25\n" +
+  "/time hh:mm -> set the time you want to receive the bot. (24h)\n-> i.e. '/time 18:25' to receive the daily comic at 18:25\n" +
   "/stop -> to stop the bot\n" +
-  "/restart -> to restart the bot with your old time"
-
+  "/restart -> to restart the bot with your old time. use '/time' to set a new one\n" +
+  "/status -> get your time and if your bot active or not"
 
 //initialize telegram bot
 function initBot(callback) {
@@ -45,38 +47,26 @@ function initBot(callback) {
   })
   //stop the bot
   bot.onText(/\/stop/, (msg) => {
+    updateUser(msg.chat.id, false)
     bot.sendMessage(msg.chat.id, "bot stopped");
   })
   //restart the bot
   bot.onText(/\/restart/, (msg) => {
+    updateUser(msg.chat.id, true)
     bot.sendMessage(msg.chat.id, "bot restarted");
   })
   //set the time for the user
   bot.onText(/\/time (.+)/, (msg, match) => {
-    //check if user exist
-    var userFound = false
-    //get the time out of the message
-    var newTime = match[1]
+    if (match[1])
+      updateUser(msg.chat.id, true, match[1])
+  })
+  //set the time for the user
+  bot.onText(/\/status/, (msg) => {
+    //find user
     for (var u = 0; u < users.length; u++) {
-      //if user found update his time
-      if (users[u].id == msg.chat.id) {
-        userFound = true
-        users[u].time = newTime
-        console.log("update time for " + msg.chat.id + " to " + newTime)
-      }
+      if (users[u].id == msg.chat.id)
+        bot.sendMessage(msg.chat.id, "your time is set to " + users[u].hour + ":" + users[u].min + " and your bot is " + (users[u].active ? "active" : "inactive"))
     }
-    //if user not found in array, add new one
-    if (!userFound) {
-      var newUser = {
-        id: msg.chat.id,
-        time: newTime
-      }
-      users.push(newUser)
-      console.log("added new user: " + JSON.stringify(newUser))
-    }
-    bot.sendMessage(msg.chat.id, "time set to: " + newTime)
-    //update user file
-    fs.writeFileSync(__dirname + '/user_config.json', JSON.stringify(users))
   })
 
   //set up done, so run callback
@@ -110,14 +100,75 @@ function readUsers(callback) {
 }
 
 //check everyHour if a user wants a pic
-//TODO: check every min, so its to 1 minute exactly, and find a way to save if user got the picture already today.
 function startInterval(callback) {
   inter = setInterval(function() {
-    var d = new Date()
-    for (i = 0; i < users.length; i++) {
-      if (users[i].time == d.getHours())
-        sendImage(d, users[i].id)
+    //remove every tick in sendPics object
+    for (var t = sendPics.length - 1; t >= 0; t--) {
+      sendPics[t].ticks
+      if (sendPics[t].ticks < 0) //if ticks less 0 remove the cached user
+        sendPics.splice(t)
     }
-  }, 3600000) //3600000 = 1 hour
-  callback() //done, so run callback
+    var d = new Date()
+    for (var i = 0; i < users.length; i++) {
+      //hits if user active && minute is +- 1 of the set minute in the option
+      if (users[i].active && users[i].hour == d.getHours() && (users[i].min >= d.getMinutes() - 1 && users[i].min <= d.getMinutes() + 1)) {
+        //check if user is not in the sendPics arr, to be sure he didnt received the comic before
+        /*TODO: test if it works like This
+         if (sendPics.findIndex(() => {
+            return users[i].id == id
+          }) != -1)*/
+        var foundInSp = false
+        for (var sp = 0; sp < sendPics.length; sp++) {
+          if (sendPics[sp].id == users[i].id)
+            foundInSp = true
+        }
+        if (!foundInSp) {
+          sendImage(d, users[i].id)
+          sendPics.push({
+            id: users[i].id,
+            ticks: 5 //save it for 5 intervals
+          })
+        }
+      }
+    }
+  }, 60000) //1 minute
+  callback() //set up done, so run callback
+}
+
+function updateUser(id, active, time) {
+  //split time to hour and min
+  var h, m
+  if (time) {
+    h = time.substring(0, time.indexOf(":"))
+    m = time.substring(time.indexOf(":") + 1)
+  }
+  for (var u = 0; u < users.length; u++) {
+    //if user found update his time
+    if (users[u].id == id) {
+      userFound = true
+      users[u].active = active //update active value
+      if (time) { //only if time is defined update it
+        users[u].hour = h
+        users[u].min = m
+        console.log("update time for " + id + " to " + time)
+        bot.sendMessage(id, "time set to " + time)
+      }
+    }
+  }
+  //if user not found in array, add new one
+  if (time) { //add user only if time is defined
+    if (!userFound) {
+      var newUser = {
+        id: id,
+        hour: h,
+        min: m,
+        active: active
+      }
+      users.push(newUser)
+      console.log("added new user: " + JSON.stringify(newUser))
+      bot.sendMessage(id, "you were added.\n you will receive your first comic at " + time)
+    }
+  }
+  //update user file
+  fs.writeFileSync(__dirname + '/user_config.json', JSON.stringify(users))
 }

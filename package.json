@@ -1,6 +1,6 @@
 {
   "name": "calvinandhobbesbot",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A Telegram Bot that send a CnH Comic every day",
   "main": "bot.js",
   "scripts": {
