@@ -41,7 +41,7 @@ function initBot() {
           console.log("added new user: " + JSON.stringify(newUser))
         }
         //update user file
-        fs.writeFileSync(__dirname + '/user_config.json', users)
+        fs.writeFileSync(__dirname + '/user_config.json', JSON.stringify(users))
         break;
     }
   })
@@ -72,7 +72,7 @@ function sendImage(date, id) {
 //read users out of file and load to useres object
 function readUsers() {
   users = []
-  users = fs.readFileSync(__dirname + '/user_config.json')
+  users = JSON.parse(fs.readFileSync(__dirname + '/user_config.json'))
   console.log(users)
 }
 
