@@ -19,14 +19,20 @@ readUsers(function() {
 })
 
 //some messages
-var welcomeMessage = "Welcome to my Calvin and Hobbes bot.\n" +
+var botVersion = "CalvinAndHobbesBot\n" +
+  "Author: FrozenMind\n" +
+  "Version: 0.1.1 (alpha)\n" +
+  "Last update: 07/09/2017\n" +
+  "Github repo: https://github.com/FrozenMind/CalvinAndHobbesBot"
+var welcomeMessage = "Welcome to my Calvin and Hobbes bot (alpha).\n" +
   "This bot send you everyday to your favorite time a daily Calvin and Hobbes comic.\n" +
   "I hope you enjoy them. Type '/help' to get started."
 var helpMessage = "Help Area:\n" +
   "/time hh:mm -> set the time you want to receive the bot. (24h)\n-> i.e. '/time 18:25' to receive the daily comic at 18:25\n" +
   "/stop -> to stop the bot\n" +
   "/restart -> to restart the bot with your old time. use '/time' to set a new one\n" +
-  "/status -> get your time and if your bot active or not"
+  "/status -> get your time and if your bot active or not\n" +
+  "/version -> to get the bot version"
 
 //initialize telegram bot
 function initBot(callback) {
@@ -67,6 +73,10 @@ function initBot(callback) {
       if (users[u].id == msg.chat.id)
         bot.sendMessage(msg.chat.id, "your time is set to " + users[u].hour + ":" + users[u].min + " and your bot is " + (users[u].active ? "active" : "inactive"))
     }
+  })
+  //check the bot version
+  bot.onText(/\/version/, (msg) => {
+    bot.sendMessage(msg.chat.id, botVersion)
   })
 
   //set up done, so run callback
