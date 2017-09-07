@@ -4,56 +4,83 @@ var TelegramBot = require('node-telegram-bot-api')
 var fs = require('fs')
 var bot
 var users = [] //user array
-var token //telegram bot api token
 var inter //interval to check if pic needs to be send
 
 //read users, init bot & start interval with callbacks, cause of sync file readers
-readUsers(function(){
+readUsers(function() {
   console.log("users loaded")
-  initBot(function(){
+  initBot(function() {
     console.log("bot initialized")
-    startInterval(function(){
+    startInterval(function() {
       console.log("interval started. enjoy the bot")
     })
   })
 })
 
-//initialite telegram bot
+//some messages
+var welcomeMessage = "Welcome to my Calvin and Hobbes bot.\n" +
+  "I hope you enjoy the comics. Type '/help' to get started."
+var helpMessage = "Help Area:\n" +
+  "/time hh:mm -> set the time you want to receive the bot. (24h) -> i.e. '/time 18:25' to receive the daily comic at 18:25\n" +
+  "/stop -> to stop the bot\n" +
+  "/restart -> to restart the bot with your old time"
+
+
+//initialize telegram bot
 function initBot(callback) {
   //read token out of file
-  bot = new TelegramBot(fs.readFileSync(__dirname + '/telegramToken.config').toString(), {
+  var token = fs.readFileSync(__dirname + '/telegramToken.config').toString().replace("\n", "")
+  console.log(token)
+  bot = new TelegramBot(token, {
     polling: true
   })
-  bot.on('message', (msg) => {
-    switch (msg.text.split(' ')[0]) {
-      case "time": //sets the time the user want to receive the img
-        //check if user exist
-        var userFound = false
-        //get the time out of the message
-        var newTime = msg.text.replace(/\s+/g, '').replace('time', '')
-        for(var u = 0; u < users.length; u++){
-          //if user found update his time
-          if(users[u].id == msg.chat.id){
-            userFound = true            
-            users[u].time = newTime
-            console.log("update time for " + msg.chat.id + " to " + newTime)
-          }
-        }
-        //if user not found in array, add new one
-        if(!userFound){
-          var newUser = {
-            id: msg.chat.id,
-            time: newTime
-          }
-          users.push(newUser)
-          console.log("added new user: " + JSON.stringify(newUser))
-        }
-        //update user file
-        fs.writeFileSync(__dirname + '/user_config.json', JSON.stringify(users))
-        break
-    }
+  //bot commands
+  //display start message
+  bot.onText(/\/start/, (msg) => {
+    bot.sendMessage(msg.chat.id, welcomeMessage);
   })
-  callback() //done, so run callback
+  //display help message
+  bot.onText(/\/help/, (msg) => {
+    bot.sendMessage(msg.chat.id, helpMessage);
+  })
+  //stop the bot
+  bot.onText(/\/stop/, (msg) => {
+    bot.sendMessage(msg.chat.id, "bot stopped");
+  })
+  //restart the bot
+  bot.onText(/\/restart/, (msg) => {
+    bot.sendMessage(msg.chat.id, "bot restarted");
+  })
+  //set the time for the user
+  bot.onText(/\/time (.+)/, (msg, match) => {
+    //check if user exist
+    var userFound = false
+    //get the time out of the message
+    var newTime = match[1]
+    for (var u = 0; u < users.length; u++) {
+      //if user found update his time
+      if (users[u].id == msg.chat.id) {
+        userFound = true
+        users[u].time = newTime
+        console.log("update time for " + msg.chat.id + " to " + newTime)
+      }
+    }
+    //if user not found in array, add new one
+    if (!userFound) {
+      var newUser = {
+        id: msg.chat.id,
+        time: newTime
+      }
+      users.push(newUser)
+      console.log("added new user: " + JSON.stringify(newUser))
+    }
+    bot.sendMessage(msg.chat.id, "time set to: " + newTime)
+    //update user file
+    fs.writeFileSync(__dirname + '/user_config.json', JSON.stringify(users))
+  })
+
+  //set up done, so run callback
+  callback()
 }
 
 //get image for the current day and send it to the user
