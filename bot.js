@@ -50,7 +50,7 @@ function initBot(callback) {
         }
         //update user file
         fs.writeFileSync(__dirname + '/user_config.json', JSON.stringify(users))
-        break;
+        break
     }
   })
   callback() //done, so run callback
@@ -61,21 +61,16 @@ function sendImage(date, id) {
   var year = date.getFullYear()
   var month = date.getMonth() + 1
   var day = date.getDate()
-
+  //load the page
   request({
     uri: "http://www.gocomics.com/calvinandhobbes/" + year + "/" + month + "/" + day,
   }, function(error, response, body) {
     var $ = cheerio.load(body)
-    //search all pics, if they have the right link
-    //TODO: replace this search with a tag id or class
-    $('img').each(function(i, ele) {
-      var link = $(this).attr('src');
-      if (link.startsWith('http://assets')) {
-        console.log(link);
-        //send pic to user
-        bot.sendPhoto(id, link);
-      }
-    })
+    //get the picture
+    var pictureUrl = $('.comic__image img').attr('src')
+    console.log(pictureUrl)
+    //send pic to user
+    bot.sendPhoto(id, pictureUrl)
   })
 }
 
@@ -91,11 +86,11 @@ function readUsers(callback) {
 //TODO: check every min, so its to 1 minute exactly, and find a way to save if user got the picture already today.
 function startInterval(callback) {
   inter = setInterval(function() {
-    var d = new Date();
+    var d = new Date()
     for (i = 0; i < users.length; i++) {
       if (users[i].time == d.getHours())
         sendImage(d, users[i].id)
     }
-  }, 3600000); //3600000 = 1 hour
+  }, 3600000) //3600000 = 1 hour
   callback() //done, so run callback
 }
