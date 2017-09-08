@@ -19,18 +19,22 @@ readUsers(function() {
 })
 
 //some messages
-var botVersion = "CalvinAndHobbesBot\n" +
+var botVersion = "CalvinAndHobbesBot\n\n" +
   "Author: FrozenMind\n" +
-  "Version: 0.1.2 (alpha)\n" +
-  "Last update: 07/09/2017\n" +
-  "Github repo: https://github.com/FrozenMind/CalvinAndHobbesBot"
-var welcomeMessage = "Welcome to my Calvin and Hobbes bot (alpha).\n" +
+  "Version: 0.1.3 (alpha)\n" +
+  "Last update: 08/09/2017\n\n" +
+  "Changelog\n\n" +
+  "* add /dailycomic to receive daily comic now\n" +
+  "* add /randomcomic to receive a random comic\n" +
+  "* check that set time has right format\n" +
+  "\nGithub repo: https://github.com/FrozenMind/CalvinAndHobbesBot"
+var welcomeMessage = "Welcome to my Calvin and Hobbes bot (alpha).\n\n" +
   "This bot send you everyday to your favorite time a daily Calvin and Hobbes comic.\n" +
   "I hope you enjoy them. Type '/help' to get started."
-var helpMessage = "Help Area:\n" +
+var helpMessage = "Help Area:\n\n" +
   "/time hh:mm -> set the time you want to receive the comic. (24h)\n-> i.e. '/time 18:25' to receive the daily comic at 18:25\n" +
   "/dailycomic -> sends you the daily comic\n" +
-  "/randomcomic -> sends you a random comic (coming soon)" +
+  "/randomcomic -> sends you a random comic\n" +
   "/stop -> to stop the bot\n" +
   "/restart -> to restart the bot with your old time. use '/time' to set a new one\n" +
   "/status -> get your time and if your bot active or not\n" +
@@ -65,8 +69,10 @@ function initBot(callback) {
   })
   //set the time for the user
   bot.onText(/\/time (.+)/, (msg, match) => {
-    if (match[1])
+    if (match[1] && match[1].match(/([0-1]?[0-9]|2[0-3]):[0-5][0-9]/)) //check if time has write format
       updateUser(msg.chat.id, true, match[1])
+    else
+      bot.sendMessage(msg.chat.id, "Please use format /time 'hh:mm'")
   })
   //set the time for the user
   bot.onText(/\/status/, (msg) => {
@@ -86,7 +92,26 @@ function initBot(callback) {
   })
   //send daily comic now
   bot.onText(/\/randomcomic/, (msg) => {
-    sendImage(new Date(), msg.chat.id)
+    var randomDate = new Date()
+    var y, m, d
+    var loopCounter = 0 //checks that loop is not infinite
+    var lastWeDate = new Date(randomDate.getFullYear() + "-" + (randomDate.getMonth() + 1) + "-" + (randomDate.getDate() - 7))
+    do {
+      y = Math.floor(Math.random() * 2 + 2016)
+      m = Math.floor(Math.random() * 12 + 1)
+      d = Math.floor(Math.random() * 31 + 1)
+      randomDate = new Date(y + "-" + m + "-" + d)
+
+      loopCounter++
+      if (loopCounter >= 100) //check that its no infinite loop
+        break
+    } while (randomDate >= lastWeDate) //random date needs to be older than 7 days
+
+    if (loopCounter < 100) { //only if random date is found
+      sendImage(randomDate, msg.chat.id)
+    } else {
+      bot.sendMessage(msg.chat.id, "something went wrong by getting a random image. Please try again. Sorry :(")
+    }
   })
 
   //set up done, so run callback
