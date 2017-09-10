@@ -149,7 +149,7 @@ function startInterval(callback) {
   inter = setInterval(function() {
     //remove every tick in sendPics object
     for (var t = sendPics.length - 1; t >= 0; t--) {
-      sendPics[t].ticks
+      sendPics[t].ticks--;
       if (sendPics[t].ticks < 0) //if ticks less 0 remove the cached user
         sendPics.splice(t)
     }
