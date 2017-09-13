@@ -147,37 +147,31 @@ function readUsers(callback) {
 //check everyHour if a user wants a pic
 function startInterval(callback) {
   inter = setInterval(function() {
-    //remove every tick in sendPics object
-    for (var t = sendPics.length - 1; t >= 0; t--) {
-      sendPics[t].ticks--;
-      if (sendPics[t].ticks < 0) //if ticks less 0 remove the cached user
-        sendPics.splice(t)
-    }
-    var d = new Date()
-    for (var i = 0; i < users.length; i++) {
-      //hits if user active && minute is +- 1 of the set minute in the option
-      if (users[i].active && users[i].hour == d.getHours() && (users[i].min >= d.getMinutes() - 1 && users[i].min <= d.getMinutes() + 1)) {
-        //check if user is not in the sendPics arr, to be sure he didnt received the comic before
-        /*TODO: test if it works like This
-         if (sendPics.findIndex(() => {
-            return users[i].id == id
-          }) != -1)*/
-        var foundInSp = false
-        for (var sp = 0; sp < sendPics.length; sp++) {
-          if (sendPics[sp].id == users[i].id)
-            foundInSp = true
-        }
-        if (!foundInSp) {
-          sendImage(d, users[i].id)
-          sendPics.push({
-            id: users[i].id,
-            ticks: 5 //save it for 5 intervals
-          })
+      //remove every tick in sendPics object
+      for (var t = sendPics.length - 1; t >= 0; t--) {
+        sendPics[t].ticks--;
+        if (sendPics[t].ticks < 0) //if ticks less 0 remove the cached user
+          sendPics.splice(t)
+      }
+      var d = new Date()
+      for (var i = 0; i < users.length; i++) {
+        //hits if user active && minute is +- 1 of the set minute in the option
+        if (users[i].active && users[i].hour == d.getHours() && (users[i].min >= d.getMinutes() - 1 && users[i].min <= d.getMinutes() + 1)) {
+          //check if user is not in the sendPics arr, to be sure he didnt received the comic before
+          if (sendPics.findIndex((o) => {
+              return users[i].id == o.id
+            }) != -1) {
+            sendImage(d, users[i].id)
+            sendPics.push({
+              id: users[i].id,
+              ticks: 5 //save it for 5 intervals
+            })
+          }
         }
       }
     }
   }, 60000) //1 minute
-  callback() //set up done, so run callback
+callback() //set up done, so run callback
 }
 
 function updateUser(id, active, time) {
