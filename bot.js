@@ -21,12 +21,12 @@ readUsers(function() {
 //some messages
 var botVersion = "CalvinAndHobbesBot\n\n" +
   "Author: FrozenMind\n" +
-  "Version: 0.1.3 (alpha)\n" +
+  "Version: 0.1.4 (alpha)\n" +
   "Last update: 08/09/2017\n\n" +
   "Changelog\n\n" +
   "* add /dailycomic to receive daily comic now\n" +
   "* add /randomcomic to receive a random comic\n" +
-  "* check that set time has right format\n" +
+  "* some security functions\n" +
   "\nGithub repo: https://github.com/FrozenMind/CalvinAndHobbesBot"
 var welcomeMessage = "Welcome to my Calvin and Hobbes bot (alpha).\n\n" +
   "This bot send you everyday to your favorite time a daily Calvin and Hobbes comic.\n" +
@@ -43,8 +43,7 @@ var helpMessage = "Help Area:\n\n" +
 //initialize telegram bot
 function initBot(callback) {
   //read token out of file
-  var token = fs.readFileSync(__dirname + '/telegramToken.config').toString().replace("\n", "")
-  console.log(token)
+  let token = fs.readFileSync(__dirname + '/telegramToken.config').toString().replace("\n", "")
   bot = new TelegramBot(token, {
     polling: true
   })
@@ -77,7 +76,7 @@ function initBot(callback) {
   //set the time for the user
   bot.onText(/\/status/, (msg) => {
     //find user
-    for (var u = 0; u < users.length; u++) {
+    for (let u = 0; u < users.length; u++) {
       if (users[u].id == msg.chat.id)
         bot.sendMessage(msg.chat.id, "your time is set to " + users[u].hour + ":" + users[u].min + " and your bot is " + (users[u].active ? "active" : "inactive"))
     }
@@ -92,10 +91,10 @@ function initBot(callback) {
   })
   //send daily comic now
   bot.onText(/\/randomcomic/, (msg) => {
-    var randomDate = new Date()
-    var y, m, d
-    var loopCounter = 0 //checks that loop is not infinite
-    var lastWeDate = new Date(randomDate.getFullYear() + "-" + (randomDate.getMonth() + 1) + "-" + (randomDate.getDate() - 7))
+    let randomDate = new Date()
+    let y, m, d
+    let loopCounter = 0 //checks that loop is not infinite
+    let lastWeDate = new Date(randomDate.getFullYear() + "-" + (randomDate.getMonth() + 1) + "-" + (randomDate.getDate() - 7))
     do {
       y = Math.floor(Math.random() * 2 + 2016)
       m = Math.floor(Math.random() * 12 + 1)
@@ -120,16 +119,16 @@ function initBot(callback) {
 
 //get image for the current day and send it to the user
 function sendImage(date, id) {
-  var year = date.getFullYear()
-  var month = date.getMonth() + 1
-  var day = date.getDate()
+  let year = date.getFullYear()
+  let month = date.getMonth() + 1
+  let day = date.getDate()
   //load the page
   request({
     uri: "http://www.gocomics.com/calvinandhobbes/" + year + "/" + month + "/" + day,
   }, function(error, response, body) {
-    var $ = cheerio.load(body)
+    let $ = cheerio.load(body)
     //get the picture
-    var pictureUrl = $('.comic__image img').attr('src')
+    let pictureUrl = $('.comic__image img').attr('src')
     console.log(pictureUrl)
     //send pic to user
     bot.sendPhoto(id, pictureUrl)
@@ -147,41 +146,42 @@ function readUsers(callback) {
 //check everyHour if a user wants a pic
 function startInterval(callback) {
   inter = setInterval(function() {
-      //remove every tick in sendPics object
-      for (var t = sendPics.length - 1; t >= 0; t--) {
-        sendPics[t].ticks--;
-        if (sendPics[t].ticks < 0) //if ticks less 0 remove the cached user
-          sendPics.splice(t)
-      }
-      var d = new Date()
-      for (var i = 0; i < users.length; i++) {
-        //hits if user active && minute is +- 1 of the set minute in the option
-        if (users[i].active && users[i].hour == d.getHours() && (users[i].min >= d.getMinutes() - 1 && users[i].min <= d.getMinutes() + 1)) {
-          //check if user is not in the sendPics arr, to be sure he didnt received the comic before
-          if (sendPics.findIndex((o) => {
-              return users[i].id == o.id
-            }) != -1) {
-            sendImage(d, users[i].id)
-            sendPics.push({
-              id: users[i].id,
-              ticks: 5 //save it for 5 intervals
-            })
-          }      
+    //remove every tick in sendPics object
+    for (let t = sendPics.length - 1; t >= 0; t--) {
+      sendPics[t].ticks--;
+      if (sendPics[t].ticks < 0) //if ticks less 0 remove the cached user
+        sendPics.splice(t)
+    }
+    let d = new Date()
+    for (let i = 0; i < users.length; i++) {
+      //hits if user active && minute is +- 1 of the set minute in the option
+      if (users[i].active && users[i].hour == d.getHours() && (users[i].min >= d.getMinutes() - 1 && users[i].min <= d.getMinutes() + 1)) {
+        //check if user is not in the sendPics arr, to be sure he didnt received the comic before
+        if (sendPics.findIndex((o) => {
+            return users[i].id == o.id
+          }) != -1) {
+          sendImage(d, users[i].id)
+          sendPics.push({
+            id: users[i].id,
+            ticks: 5 //save it for 5 intervals
+          })
+        }
       }
     }
   }, 60000) //1 minute
-callback() //set up done, so run callback
+  callback() //set up done, so run callback
 }
 
 function updateUser(id, active, time) {
-  var userFound = false
+  //TODO: use findIndex here
+  let userFound = false
   //split time to hour and min
-  var h, m
+  let h, m
   if (time) {
     h = time.substring(0, time.indexOf(":"))
     m = time.substring(time.indexOf(":") + 1)
   }
-  for (var u = 0; u < users.length; u++) {
+  for (let u = 0; u < users.length; u++) {
     //if user found update his time
     if (users[u].id == id) {
       userFound = true
@@ -197,7 +197,7 @@ function updateUser(id, active, time) {
   //if user not found in array, add new one
   if (time) { //add user only if time is defined
     if (!userFound) {
-      var newUser = {
+      let newUser = {
         id: id,
         hour: h,
         min: m,

@@ -9,7 +9,7 @@ Open Telegram and search for **@calvinandhobbesbot**.
 ## Commands
 * /start      -> start the bot
 * /help       -> open help area
-* /time hh:mm -> set the time you want to receive the comic. (24h) 
+* /time hh:mm -> set the time you want to receive the comic. (24h)
   * -> i.e. '/time 18:25' to receive the daily comic at 18:25
 * /dailycomic -> sends you the daily comic
 * /randomcomic-> sends a random comic
@@ -19,4 +19,4 @@ Open Telegram and search for **@calvinandhobbesbot**.
 * /version    -> to get the bot information
 
 ### Information
-Version: 0.1.3 (alpha)
+Version: 0.1.4 (alpha)
