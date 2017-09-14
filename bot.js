@@ -166,8 +166,7 @@ function startInterval(callback) {
               id: users[i].id,
               ticks: 5 //save it for 5 intervals
             })
-          }
-        }
+          }      
       }
     }
   }, 60000) //1 minute
