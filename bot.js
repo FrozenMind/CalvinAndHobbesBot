@@ -1,11 +1,11 @@
-var request = require("request")
-var cheerio = require("cheerio")
-var TelegramBot = require('node-telegram-bot-api')
-var fs = require('fs')
-var bot
-var users = [] //user array
-var inter //interval to check if pic needs to be send
-var sendPics = [] //cache which user received a pic in the last 3 min
+let request = require("request"),
+  cheerio = require("cheerio"),
+  TelegramBot = require('node-telegram-bot-api'),
+  fs = require('fs'),
+  bot,
+  users = [], //user array
+  inter, //interval to check if pic needs to be send
+  sendPics = [] //cache which user received a pic in the last 3 min
 
 //read users, init bot & start interval with callbacks, cause of sync file readers
 readUsers(function() {
@@ -19,7 +19,7 @@ readUsers(function() {
 })
 
 //some messages
-var botVersion = "CalvinAndHobbesBot\n\n" +
+let botVersion = "CalvinAndHobbesBot\n\n" +
   "Author: FrozenMind\n" +
   "Version: 0.1.4 (alpha)\n" +
   "Last update: 08/09/2017\n\n" +
@@ -28,10 +28,10 @@ var botVersion = "CalvinAndHobbesBot\n\n" +
   "* add /randomcomic to receive a random comic\n" +
   "* some security functions\n" +
   "\nGithub repo: https://github.com/FrozenMind/CalvinAndHobbesBot"
-var welcomeMessage = "Welcome to my Calvin and Hobbes bot (alpha).\n\n" +
+let welcomeMessage = "Welcome to my Calvin and Hobbes bot (alpha).\n\n" +
   "This bot send you everyday to your favorite time a daily Calvin and Hobbes comic.\n" +
   "I hope you enjoy them. Type '/help' to get started."
-var helpMessage = "Help Area:\n\n" +
+let helpMessage = "Help Area:\n\n" +
   "/time hh:mm -> set the time you want to receive the comic. (24h)\n-> i.e. '/time 18:25' to receive the daily comic at 18:25\n" +
   "/dailycomic -> sends you the daily comic\n" +
   "/randomcomic -> sends you a random comic\n" +
