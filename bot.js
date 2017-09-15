@@ -159,7 +159,7 @@ function startInterval(callback) {
         //check if user is not in the sendPics arr, to be sure he didnt received the comic before
         if (sendPics.findIndex((o) => {
             return users[i].id == o.id
-          }) != -1) {
+          }) == -1) {
           sendImage(d, users[i].id)
           sendPics.push({
             id: users[i].id,
