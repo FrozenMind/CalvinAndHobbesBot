@@ -21,14 +21,12 @@ readUsers(function() {
 //some messages
 let botVersion = "CalvinAndHobbesBot\n\n" +
   "Author: FrozenMind\n" +
-  "Version: 0.1.4 (alpha)\n" +
-  "Last update: 08/09/2017\n\n" +
+  "Version: 0.1.6 - beta\n" +
+  "Last update: 13/10/2017\n\n" +
   "Changelog\n\n" +
-  "* add /dailycomic to receive daily comic now\n" +
-  "* add /randomcomic to receive a random comic\n" +
-  "* some security functions\n" +
+  "* fix image api\n" +
   "\nGithub repo: https://github.com/FrozenMind/CalvinAndHobbesBot"
-let welcomeMessage = "Welcome to my Calvin and Hobbes bot (alpha).\n\n" +
+let welcomeMessage = "Welcome to my Calvin and Hobbes bot\n\n" +
   "This bot send you everyday to your favorite time a daily Calvin and Hobbes comic.\n" +
   "I hope you enjoy them. Type '/help' to get started."
 let helpMessage = "Help Area:\n\n" +
@@ -128,7 +126,7 @@ function sendImage(date, id) {
   }, function(error, response, body) {
     let $ = cheerio.load(body)
     //get the picture
-    let pictureUrl = $('.comic__image img').attr('src')
+    let pictureUrl = $('.item-comic-image img').attr('src')
     console.log(pictureUrl)
     //send pic to user
     bot.sendPhoto(id, pictureUrl)
