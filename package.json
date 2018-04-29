@@ -19,6 +19,7 @@
   "dependencies": {
     "cheerio": "^0.22.0",
     "node-telegram-bot-api": "^0.27.1",
+    "npm": "^6.0.0",
     "request": "^2.81.0"
   }
 }
