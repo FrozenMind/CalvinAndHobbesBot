@@ -1,11 +1,12 @@
 # CalvinAndHobbesBot
+
 A Telegram Bot that send you a Calvin and Hobbes comic once everyday.
 
 You can define your time at which you want to receive the comic.
 
-For a more detailed description, changelogs, etc. check: http://games-broduction.com/calvin-and-hobbes-bot/
-
 ## Get the bot
+!!! *Bot is currently offline* !!!
+
 Open Telegram and search for **@calvinandhobbesbot**.
 
 ## Commands
@@ -21,4 +22,4 @@ Open Telegram and search for **@calvinandhobbesbot**.
 * /version    -> to get the bot information
 
 ### Information
-Version: 0.1.4 (alpha)
+Version: 0.1.4
