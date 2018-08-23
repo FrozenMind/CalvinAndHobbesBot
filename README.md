@@ -1,3 +1,5 @@
+# ATTENTION: Bot is currently offline due to potential security vulnerabilities
+
 # CalvinAndHobbesBot
 
 A Telegram Bot that send you a Calvin and Hobbes comic once everyday.
@@ -5,7 +7,7 @@ A Telegram Bot that send you a Calvin and Hobbes comic once everyday.
 You can define your time at which you want to receive the comic.
 
 ## Get the bot
-!!! *Bot is currently offline* !!!
+**!!! Bot is currently offline !!!**
 
 Open Telegram and search for **@calvinandhobbesbot**.
 
